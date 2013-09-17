@@ -1,0 +1,143 @@
+import java.util.List;
+
+/**
+ *  This class represents a path through the maze made up of MazeCell and
+ *  passages linking cells.
+ *  
+ *  @author Tony Zhang
+ *  EECS 293 Software Craftsmanship
+ *  2013 Fall Semester
+ *  Programming Assignment 2
+ */
+public class MazeRoute {
+
+	/*
+	 * Parameters of the class:
+	 * 
+	 * valid boolean variable that holds the 
+	 * 	cell's validity
+	 * 
+	 * MAX_VALUE passage time that represents an
+	 * 	unusable passage
+	 * 
+	 * mazeRoute is a list of cells in a path
+	 */
+	private boolean valid;
+	private int MAX_VALUE = Integer.MAX_VALUE;
+	private List<MazeCell> mazeRoute;
+	
+	/*
+	 * The constructor initializes an invalid MazeRoute. It throws no exception.
+	 */
+	public MazeRoute() {
+		this.valid = false;
+	}
+	
+	/*
+	 * This method adds a list of valid cells to an invalid MazeRoute. It throws
+	 * an exception if any of the cells in the list are invalid. It returns false if 
+	 * MazeRoute already has cells. 
+	 * 
+	 * @param	list of cells to be added to the MazeRoute
+	 * @return	true if the cells are added to MazeRoute
+	 * @throws 	UninitializedObjectException if MazeRoute is invalid 
+	 */
+	public boolean addCells(List<MazeCell> route) throws UninitializedObjectException {
+		if (this.valid == false) {
+			MazeCell[] copy = route.toArray(new MazeCell[0]);
+			for (MazeCell cell : copy) {
+				if (cell.isValid() == true) {
+					mazeRoute.add(cell);
+				}
+				else
+					throw new UninitializedObjectException();
+			}
+			this.valid = true;
+			return true;
+		}
+		else
+			return false;
+	}
+	
+	/*
+	 * This method checks the validity of MazeRoute and returns true
+	 * if it is valid.
+	 * 
+	 * @return	true if MazeRoute is valid
+	 */
+	public boolean isValid() {
+		if (this.valid == true) {
+			return true;
+		}
+		else
+			return false;
+	}
+	
+	/*
+	 * This method checks the validity of MazeRoute and returns a list of
+	 * the cells in the route.
+	 * 
+	 * @return	the list of cells in MazeRoute
+	 * @throws 	UninitializedObjectException if MazeRoute is invalid 
+	 */
+	public List<MazeCell> getCells() throws UninitializedObjectException {
+		if (this.valid == true) {
+			List<MazeCell> copy = mazeRoute;
+			return copy;
+		}
+		else
+			throw new UninitializedObjectException();
+	}
+	
+	/*
+	 * This method checks the validity of MazeRoute and prints out a string 
+	 * of the route and the passage times between each cell.
+	 * 
+	 * @return	prints out string of all the cells and passage times
+	 * @throws 	UninitializedObjectException if MazeRoute is invalid 
+	 */
+	public String toString() throws UninitializedObjectException {
+		if (this.valid == true) {
+			StringBuffer s = new StringBuffer();
+			MazeCell[] copy = mazeRoute.toArray(new MazeCell[0]);
+			for (int i = 0; i < mazeRoute.size() - 1; i++) {
+				int time = copy[i].passageTimeTo(copy[i+1]);
+				s.append(copy[i].toString() + "->" + copy[i+1] + "time = " + time);
+			}
+			return s.toString();
+		}
+		else
+			throw new UninitializedObjectException();
+	}
+	
+	/*
+	 * This method checks the validity of MazeRoute and sums up all the 
+	 * passage times between the cells in the route.
+	 * 
+	 * @return	returns the total travel time 
+	 * @throws 	UninitializedObjectException if MazeRoute is invalid 
+	 */
+	public int travelTime() throws UninitializedObjectException {
+		if (this.valid != true) {
+			throw new UninitializedObjectException();
+		}
+		else if (mazeRoute.size() > 1) {
+			int time = 0;
+			MazeCell[] copy = mazeRoute.toArray(new MazeCell[0]);
+			for (int i = 0; i < mazeRoute.size() - 1; i++) {
+				int t = copy[i].passageTimeTo(copy[i+1]);
+				if (t != MAX_VALUE) {
+					time = time + t;
+				}
+				else
+					return MAX_VALUE;
+			}
+			return time;
+		}
+		else 
+			return 0;
+	}
+	
+
+	
+}
