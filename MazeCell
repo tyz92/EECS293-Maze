@@ -1,0 +1,221 @@
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+/**
+ *  This class represents a single cell in the maze and its respective passages to 
+ *  adjoining cells. 
+ *  
+ *  @author Tony Zhang
+ *  EECS 293 Software Craftsmanship
+ *  2013 Fall Semester
+ *  Programming Assignment 2
+ */
+public class MazeCell {
+
+	/*
+	 * Parameters of the class:
+	 * 
+	 * valid boolean variable that holds the 
+	 * 	cell's validity
+	 * 
+	 * MAX_VALUE passage time that represents an
+	 * 	unusable passage
+	 * 
+	 * out_passages is a map of the passages leading
+	 * 	to other cells
+	 * 
+	 * visit boolean variable that holds whether or not
+	 * 	the cell has been visited before
+	 * 
+	 * exit boolean variable that holds whether or not
+	 * 	the cell is the exit to the maze
+	 */
+	private boolean valid;
+	private int MAX_VALUE = Integer.MAX_VALUE;
+	private Map<MazeCell, Integer> outPassages;
+	private boolean visit;
+	private boolean exit;
+	
+	/*
+	 * The constructor initializes an invalid MazeCell. It throws no exception.
+	 */
+	public MazeCell() {
+		this.valid = false;
+	}
+	
+	/*
+	 * This method adds a map of passages to a cell and marks it valid. if the
+	 * cell already is valid, the passages are not added.
+	 * 
+	 * @param	map of passages to be added to lead out of cell
+	 * @return	true if passages are added to cell
+	 */
+	public boolean addPassages(Map<MazeCell, Integer> passages) {
+		if (this.valid == false) {
+			outPassages = passages;
+			this.valid = true;
+			return true;
+		}
+		else
+			return false;
+	}
+	
+	/*
+	 * This method checks the validity of MazeCell and returns true
+	 * if it is valid.
+	 * 
+	 * @return	true if cell is valid
+	 */
+	public boolean isValid() {
+		if (this.valid == true) {
+			return true;
+		}
+		else
+			return false;		
+	}
+	
+	/*
+	 * This method returns the hashcode of the cell.
+	 * 
+	 * @return	hashcode of the cell
+	 */
+	public int hashCode() {
+		return outPassages.hashCode();
+	}
+	
+	/*
+	 * This method returns all the passages leading out of the cell that
+	 * have a passage time less than MAX_VALUE.
+	 * 
+	 * @return	map of the passages leading out of the cell
+	 * @throws 	UninitializedObjectException if MazeCell is invalid 
+	 */
+	public Map<MazeCell, Integer> passages() throws UninitializedObjectException {
+		if (this.valid == true) {
+			Map<MazeCell, Integer> copy = outPassages;
+			for (Map.Entry<MazeCell, Integer> entry : outPassages.entrySet()) {
+				if (entry.getValue() < MAX_VALUE) {
+					copy.put(entry.getKey(), entry.getValue());
+				}
+			}
+			return copy;
+		}
+		else
+			throw new UninitializedObjectException();
+	}
+	
+	/*
+	 * This method returns the passage time to a different cell if there exists
+	 * a passage between them.
+	 * 
+	 * @param	a cell other than this cell
+	 * @return	passage time to the given cell
+	 * @throws 	UninitializedObjectException if MazeCell is invalid 
+	 */
+	public int passageTimeTo(MazeCell cell) throws UninitializedObjectException {
+		if (this.valid == true) {
+			for (Map.Entry<MazeCell, Integer> entry : outPassages.entrySet()) {
+				if (entry.getKey() == cell) {
+					return entry.getValue();
+				}
+			}
+			return MAX_VALUE;
+		}
+		else
+			throw new UninitializedObjectException();
+	}
+	
+	/*
+	 * This method returns a set of accessible cells from this cell if the
+	 * passage time is less than MAX_VALUE.
+	 * 
+	 * @return	a set of accessible cells from this cell
+	 * @throws 	UninitializedObjectException if MazeCell is invalid 
+	 */
+	public Set<MazeCell> connectedCells() throws UninitializedObjectException {
+		if (this.valid == true) {
+			Set<MazeCell> set = new HashSet<MazeCell>();
+			for (Map.Entry<MazeCell, Integer> entry : outPassages.entrySet()) {
+				if (entry.getValue() < MAX_VALUE) {
+					set.add(entry.getKey());
+				}
+			}
+			return set;
+		}
+		else
+			throw new UninitializedObjectException();
+	}
+	
+	/*
+	 * This method checks for passages with passage time less than MAX_VALUE, 
+	 * if none exist, then the cell is a dead end.
+	 * 
+	 * @return	true if there are no passages leading away from the cell
+	 * @throws 	UninitializedObjectException if MazeCell is invalid 
+	 */
+	public boolean isDeadEnd() throws UninitializedObjectException {
+		if (this.valid == true) {
+			for (Map.Entry<MazeCell, Integer> entry : outPassages.entrySet()) {
+				if (entry.getValue() < MAX_VALUE) {
+					return false;
+				}
+			}
+			return true;
+		}
+		else
+			throw new UninitializedObjectException();
+	}
+	
+	/*
+	 * This method prints out the hashcode for this cell.
+	 * 
+	 * @return	print out of the hashcode for this cell
+	 */
+	public String toString() {
+		StringBuffer s = new StringBuffer();
+		s.append("Cell #" + this.hashCode());
+		return s.toString();
+	}
+	
+	/*
+	 * This method checks if the MazeCell has been visited already.
+	 * 
+	 * @return	true if cell has been visited
+	 */
+	public boolean visited() {
+		if (this.visit == true) {
+			return true;
+		}
+		else
+			visit = true;
+			return false;		
+	}
+	
+	/*
+	 * This method checks if the MazeCell is the exit to the maze.
+	 * 
+	 * @return	true if cell is the exit to the maze
+	 */
+	public boolean isExit() {
+		if (this.exit == true) {
+			return true;
+		}
+		else
+			return false;		
+	}
+	
+	/*
+	 * This method makes the MazeCell the exit to the maze.
+	 * 
+	 * @return	true if cell is the exit to the maze
+	 */
+	public void makeExit() throws UninitializedObjectException {
+		if (this.valid == true) {
+			this.exit = true;
+		}
+		else
+			throw new UninitializedObjectException();
+	}
+	
+}
